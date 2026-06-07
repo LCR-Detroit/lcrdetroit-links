@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeChurch Riverside Detroit — Links</title>
+  <meta name="description" content="Listen, watch, give, and connect with LifeChurch Riverside Detroit." />
+
+  <!-- Open Graph / social preview (shows when the link is shared) -->
+  <meta property="og:title" content="LifeChurch Riverside Detroit" />
+  <meta property="og:description" content="Listen, watch, give, and connect with us." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lcrdetroit.org/links" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+
+  <style>
+    :root {
+      /* Swap these six values to rebrand the whole page */
+      --bg:        #F4EFE6;  /* warm ivory */
+      --bg-2:      #EAE1D1;  /* deeper ivory for the glow */
+      --surface:   #FBF8F2;  /* card background */
+      --ink:       #211D17;  /* primary text */
+      --ink-soft:  #6A6052;  /* secondary text */
+      --line:      #E2D9C7;  /* borders */
+      --accent:    #14534E;  /* river teal — primary action / give */
+      --accent-2:  #0E3B37;  /* accent hover */
+      --gold:      #B07D2B;  /* small accents */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Karla', system-ui, sans-serif;
+      color: var(--ink);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(120% 60% at 50% -10%, var(--bg-2) 0%, var(--bg) 60%),
+        radial-gradient(80% 40% at 100% 110%, rgba(20,83,78,0.08) 0%, rgba(20,83,78,0) 70%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      padding: 56px 20px 48px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .wrap { width: 100%; max-width: 460px; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 36px; }
+
+    .logo {
+      width: 84px; height: 84px;
+      margin: 0 auto 22px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 25px;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      box-shadow: 0 8px 28px rgba(33,29,23,0.06);
+    }
+    /* To use a real logo, replace the .logo div with:
+       <img class="logo" src="logo.png" alt="LifeChurch Riverside Detroit" style="object-fit:cover" /> */
+
+    .church-name {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: 27px;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+    }
+    .church-name .accent { color: var(--accent); }
+
+    .tagline {
+      margin-top: 10px;
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      letter-spacing: 0.01em;
+    }
+
+    .site-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 16px;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1.5px solid transparent;
+      padding-bottom: 2px;
+      transition: border-color 0.2s ease;
+    }
+    .site-link:hover { border-color: var(--accent); }
+
+    /* Section labels */
+    .section-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 28px 4px 12px;
+    }
+    .section-label:first-of-type { margin-top: 4px; }
+
+    /* Link buttons */
+    .links { display: flex; flex-direction: column; gap: 11px; }
+
+    .link {
+      display: flex; align-items: center; gap: 15px;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      border-radius: 15px;
+      padding: 16px 18px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      box-shadow: 0 2px 10px rgba(33,29,23,0.03);
+    }
+    .link:hover {
+      transform: translateY(-2px);
+      border-color: #D2C6AE;
+      box-shadow: 0 10px 24px rgba(33,29,23,0.09);
+    }
+    .link .icon {
+      flex-shrink: 0;
+      width: 26px; font-size: 24px;
+      color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .link .text { flex: 1; min-width: 0; }
+    .link .title { font-size: 15.5px; font-weight: 600; line-height: 1.25; }
+    .link .sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+    .link .arrow { flex-shrink: 0; font-size: 18px; color: var(--ink-soft); opacity: 0.6; }
+
+    /* Give = filled accent button */
+    .link.give {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(20,83,78,0.22);
+    }
+    .link.give:hover { background: var(--accent-2); border-color: var(--accent-2); }
+    .link.give .icon, .link.give .arrow { color: #fff; opacity: 1; }
+    .link.give .sub { color: rgba(255,255,255,0.78); }
+
+    /* Footer */
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      letter-spacing: 0.02em;
+    }
+    .footer .dot { color: var(--gold); margin: 0 7px; }
+
+    /* Entrance animation */
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal { opacity: 0; transform: translateY(10px); animation: rise 0.55s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+      .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}
+      .d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.40s}
+      .d7{animation-delay:.47s}.d8{animation-delay:.54s}
+      @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+    }
+
+    a:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <div class="logo reveal d1" aria-hidden="true">LCR</div>
+      <h1 class="church-name reveal d2">LifeChurch <span class="accent">Riverside</span> Detroit</h1>
+      <p class="tagline reveal d3">Listen, watch, give, and connect with us.</p>
+      <a class="site-link reveal d3" href="https://www.lifechurchriversidedetroit.org" target="_blank" rel="noopener noreferrer">
+        Visit our website
+        <iconify-icon icon="lucide:arrow-up-right" aria-hidden="true"></iconify-icon>
+      </a>
+    </header>
+
+    <p class="section-label reveal d3">Listen to the Sunday Sermon</p>
+    <div class="links">
+      <a class="link reveal d4" href="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" target="_blank" rel="noopener noreferrer" aria-label="Listen on Spotify">
+        <span class="icon"><iconify-icon icon="simple-icons:spotify" aria-hidden="true"></iconify-icon></span>
+        <span class="text"><span class="title">Sunday Sermon Podcast</span><span class="sub">Listen on Spotify</span></span>
+        <iconify-icon class="arrow" icon="lucide:arrow-up-right" aria-hidden="true"></iconify-icon>
+      </a>
+      <a class="link reveal d5" href="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" target="_blank" rel="noopener noreferrer" aria-label="Listen on Apple Podcasts">
+        <span class="icon"><iconify-icon icon="simple-icons:applepodcasts" aria-hidden="true"></iconify-icon></span>
+        <span class="text"><span class="title">Sunday Sermon Podcast</span><span class="sub">Listen on Apple Podcasts</span></span>
+        <iconify-icon class="arrow" icon="lucide:arrow-up-right" aria-hidden="true"></iconify-icon>
+      </a>
+    </div>
+
+    <p class="section-label reveal d5">Watch &amp; Follow</p>
+    <div class="links">
+      <a class="link reveal d6" href="https://www.youtube.com/@LCR313" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube">
+        <span class="icon"><iconify-icon icon="simple-icons:youtube" aria-hidden="true"></iconify-icon></span>
+        <span class="text"><span class="title">YouTube</span><span class="sub">Watch services &amp; messages</span></span>
+        <iconify-icon class="arrow" icon="lucide:arrow-up-right" aria-hidden="true"></iconify-icon>
+      </a>
+      <a class="link reveal d7" href="https://www.facebook.com/lcr313" target="_blank" rel="noopener noreferrer" aria-label="Follow on Facebook">
+        <span class="icon"><iconify-icon icon="simple-icons:facebook" aria-hidden="true"></iconify-icon></span>
+        <span class="text"><span class="title">Facebook</span><span class="sub">Follow for updates</span></span>
+        <iconify-icon class="arrow" icon="lucide:arrow-up-right" aria-hidden="true"></iconify-icon>
+      </a>
+    </div>
+
+    <p class="section-label reveal d7">Support the Ministry</p>
+    <div class="links">
+      <a class="link give reveal d8" href="https://lifechurch-riverside.churchcenter.com/giving" target="_blank" rel="noopener noreferrer" aria-label="Give online">
+        <span class="icon"><iconify-icon icon="lucide:hand-heart" aria-hidden="true"></iconify-icon></span>
+        <span class="text"><span class="title">Give Online</span><span class="sub">Secure giving via Church Center</span></span>
+        <iconify-icon class="arrow" icon="lucide:arrow-up-right" aria-hidden="true"></iconify-icon>
+      </a>
+    </div>
+
+    <footer class="footer reveal d8">
+      LifeChurch Riverside <span class="dot">&bull;</span> Detroit, Michigan
+    </footer>
+  </main>
+</body>
+</html>

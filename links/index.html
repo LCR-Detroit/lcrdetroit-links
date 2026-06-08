@@ -4,17 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Content Security Policy: allow only the resources this page actually uses
-       (Google Fonts stylesheet + font files) and the page's own inline styles.
-       Scripts, frames, objects, and outbound connections are all denied.
-       NOTE: the /redesign upgrade adds JS (clipboard/share) + a QR CDN, so it
-       will need script-src/connect-src/img-src loosened — revisit then. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'" />
+  <!-- Content Security Policy: allow only what this page uses.
+       - script: our own app.js (self) + the pinned QR library on jsDelivr (SRI'd below)
+       - style:  inline <style> block + Google Fonts stylesheet
+       - font:   Google Fonts files
+       - img:    self + data: URIs (the generated QR code is a data: GIF)
+       Everything else (frames, objects, outbound connections) is denied.
+       frame-ancestors intentionally omitted so /links can be iframe-embedded later. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'" />
 
   <title>LifeChurch Riverside Detroit — Links</title>
   <meta name="description" content="Listen, watch, give, and connect with LifeChurch Riverside Detroit." />
 
-  <!-- Open Graph / social preview (shows when the link is shared) -->
+  <!-- Open Graph / social preview -->
   <meta property="og:title" content="LifeChurch Riverside Detroit" />
   <meta property="og:description" content="Listen, watch, give, and connect with us." />
   <meta property="og:type" content="website" />
@@ -22,216 +24,363 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,500;1,600&display=swap" rel="stylesheet" />
 
   <style>
-    :root {
-      /* Swap these six values to rebrand the whole page */
-      --bg:        #F4EFE6;  /* warm ivory */
-      --bg-2:      #EAE1D1;  /* deeper ivory for the glow */
-      --surface:   #FBF8F2;  /* card background */
-      --ink:       #211D17;  /* primary text */
-      --ink-soft:  #6A6052;  /* secondary text */
-      --line:      #E2D9C7;  /* borders */
-      --accent:    #14534E;  /* river teal — primary action / give */
-      --accent-2:  #0E3B37;  /* accent hover */
-      --gold:      #B07D2B;  /* small accents */
+    :root{
+      --accent:#1C5C46;
+      --bg:#EBE7DC;
+      --bg-glow:#F3EFE6;
+      --card:#F5F2EB;
+      --card-bd:rgba(31,29,24,.07);
+      --ink:#211F1A;
+      --ink-soft:#4C473D;
+      --muted:#8E8779;
+      --label:#A29B8C;
+      --shadow:0 1px 2px rgba(40,35,25,.04), 0 6px 18px rgba(40,35,25,.05);
+      --shadow-hi:0 2px 4px rgba(40,35,25,.06), 0 14px 32px rgba(40,35,25,.10);
+      --radius:18px;
+      --maxw:480px;
+      --sans:"Helvetica Neue",Helvetica,system-ui,-apple-system,sans-serif;
+      --serif:"Spectral",Georgia,serif;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Karla', system-ui, sans-serif;
-      color: var(--ink);
-      background-color: var(--bg);
-      background-image:
-        radial-gradient(120% 60% at 50% -10%, var(--bg-2) 0%, var(--bg) 60%),
-        radial-gradient(80% 40% at 100% 110%, rgba(20,83,78,0.08) 0%, rgba(20,83,78,0) 70%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      padding: 56px 20px 48px;
-      display: flex;
-      justify-content: center;
+    /* Auto dark mode — follows the visitor's device setting */
+    @media (prefers-color-scheme:dark){
+      :root{
+        --bg:#181611;
+        --bg-glow:#211E17;
+        --card:#23201A;
+        --card-bd:rgba(255,251,240,.08);
+        --ink:#F1ECE1;
+        --ink-soft:#C8C1B2;
+        --muted:#8E8779;
+        --label:#7C7567;
+        --shadow:0 1px 2px rgba(0,0,0,.25), 0 8px 22px rgba(0,0,0,.28);
+        --shadow-hi:0 2px 4px rgba(0,0,0,.3), 0 16px 36px rgba(0,0,0,.4);
+      }
+      .mark{background:#2C2820;}
     }
-
-    .wrap { width: 100%; max-width: 460px; }
-
-    /* Header */
-    .header { text-align: center; margin-bottom: 36px; }
-
-    .logo {
-      width: 84px; height: 84px;
-      margin: 0 auto 22px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1.5px solid var(--line);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Fraunces', serif;
-      font-weight: 500;
-      font-size: 25px;
-      letter-spacing: 0.06em;
-      color: var(--accent);
-      box-shadow: 0 8px 28px rgba(33,29,23,0.06);
+    *{box-sizing:border-box;}
+    html,body{margin:0;}
+    body{
+      font-family:var(--sans);
+      color:var(--ink);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
-    /* To use a real logo, replace the .logo div with:
-       <img class="logo" src="logo.png" alt="LifeChurch Riverside Detroit" style="object-fit:cover" /> */
-
-    .church-name {
-      font-family: 'Fraunces', serif;
-      font-weight: 500;
-      font-size: 27px;
-      line-height: 1.18;
-      letter-spacing: -0.01em;
+    .page{
+      min-height:100vh;
+      background:
+        radial-gradient(120% 60% at 50% -8%, var(--bg-glow), transparent 60%),
+        var(--bg);
+      padding:48px 22px 40px;
+      transition:background .3s ease,color .3s ease;
     }
-    .church-name .accent { color: var(--accent); }
+    .wrap{max-width:var(--maxw);margin:0 auto;}
 
-    .tagline {
-      margin-top: 10px;
-      font-size: 14.5px;
-      color: var(--ink-soft);
-      letter-spacing: 0.01em;
+    /* ---- header ---- */
+    .head{
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      margin-bottom:40px;
     }
+    .mark{
+      width:96px;height:96px;border-radius:50%;
+      background:#FCFBF7;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 0 26px;
+      box-shadow:0 2px 6px rgba(40,35,25,.07), 0 12px 30px rgba(40,35,25,.10);
+    }
+    .mark span{
+      font-family:var(--serif);font-weight:600;font-size:26px;
+      letter-spacing:.04em;color:var(--accent);
+    }
+    .brandname{
+      font-family:var(--serif);font-weight:600;white-space:nowrap;
+      font-size:clamp(20px,5.7vw,29px);line-height:1.2;letter-spacing:-.01em;
+      margin:0 0 12px;color:var(--ink);max-width:100%;
+    }
+    .brandname em{font-style:italic;color:var(--accent);}
+    .tagline{margin:0;color:var(--muted);font-size:15.5px;letter-spacing:.005em;}
+    .visit{
+      display:inline-flex;align-items:center;gap:5px;
+      margin-top:20px;
+      font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--accent);text-decoration:none;
+      padding:4px 2px;border-radius:6px;transition:opacity .15s ease;
+    }
+    .visit svg{width:13px;height:13px;}
+    .visit:hover{opacity:.65;}
+    .visit:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
 
-    .site-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-top: 16px;
-      font-size: 13px; font-weight: 600;
-      letter-spacing: 0.04em; text-transform: uppercase;
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1.5px solid transparent;
-      padding-bottom: 2px;
-      transition: border-color 0.2s ease;
+    /* ---- sections ---- */
+    .section{margin-bottom:26px;}
+    .seclabel{
+      margin:0 0 11px 4px;
+      font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      color:var(--label);
     }
-    .site-link:hover { border-color: var(--accent); }
+    .cards{display:flex;flex-direction:column;gap:11px;}
 
-    /* Section labels */
-    .section-label {
-      font-size: 11.5px;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ink-soft);
-      margin: 28px 4px 12px;
+    /* ---- card ---- */
+    .card{
+      position:relative;
+      display:flex;flex-direction:column;
+      background:var(--card);
+      border:1px solid var(--card-bd);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
     }
-    .section-label:first-of-type { margin-top: 4px; }
+    .card__row{display:flex;align-items:center;gap:14px;padding:15px 16px;}
+    .card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi);border-color:color-mix(in oklab,var(--accent) 22%,var(--card-bd));}
+    .card__hit{position:absolute;inset:0;z-index:1;border-radius:var(--radius);}
+    .card__hit:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;}
 
-    /* Link buttons */
-    .links { display: flex; flex-direction: column; gap: 11px; }
+    .card__logo{flex:0 0 auto;width:38px;height:38px;display:flex;align-items:center;justify-content:center;}
+    .card__logo .brand{width:38px;height:38px;border-radius:9px;display:block;}
+    .card__logo .glyph{width:26px;height:26px;color:var(--accent);}
 
-    .link {
-      display: flex; align-items: center; gap: 15px;
-      background: var(--surface);
-      border: 1.5px solid var(--line);
-      border-radius: 15px;
-      padding: 16px 18px;
-      text-decoration: none;
-      color: var(--ink);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-      box-shadow: 0 2px 10px rgba(33,29,23,0.03);
-    }
-    .link:hover {
-      transform: translateY(-2px);
-      border-color: #D2C6AE;
-      box-shadow: 0 10px 24px rgba(33,29,23,0.09);
-    }
-    .link .icon {
-      flex-shrink: 0;
-      width: 26px; font-size: 24px;
-      color: var(--ink);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .link .text { flex: 1; min-width: 0; }
-    .link .title { font-size: 15.5px; font-weight: 600; line-height: 1.25; }
-    .link .sub { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
-    .link .arrow { flex-shrink: 0; font-size: 18px; color: var(--ink-soft); opacity: 0.6; }
+    .card__meta{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1;}
+    .card__title{font-weight:700;font-size:15.5px;color:var(--ink);letter-spacing:-.005em;line-height:1.25;}
+    .card__desc{font-size:12.5px;color:var(--muted);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-    /* Give = filled accent button */
-    .link.give {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-      box-shadow: 0 6px 20px rgba(20,83,78,0.22);
-    }
-    .link.give:hover { background: var(--accent-2); border-color: var(--accent-2); }
-    .link.give .icon, .link.give .arrow { color: #fff; opacity: 1; }
-    .link.give .sub { color: rgba(255,255,255,0.78); }
+    .card__right{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
+    .card__actions{display:flex;align-items:center;gap:2px;position:relative;z-index:2;}
+    .card__ext{display:flex;color:var(--muted);opacity:.7;pointer-events:none;}
+    .card__ext svg{width:17px;height:17px;}
 
-    /* Footer */
-    .footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 12.5px;
-      color: var(--ink-soft);
-      letter-spacing: 0.02em;
+    .iconbtn{
+      width:32px;height:32px;flex:0 0 auto;
+      display:flex;align-items:center;justify-content:center;
+      border:none;background:transparent;color:var(--muted);
+      border-radius:9px;cursor:pointer;
+      transition:background .14s ease,color .14s ease,transform .1s ease;
     }
-    .footer .dot { color: var(--gold); margin: 0 7px; }
+    .iconbtn svg{width:16px;height:16px;}
+    .iconbtn:hover{background:color-mix(in oklab,var(--accent) 12%,transparent);color:var(--accent);}
+    .iconbtn:active{transform:scale(.9);}
+    .iconbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
 
-    /* Entrance animation */
-    @media (prefers-reduced-motion: no-preference) {
-      .reveal { opacity: 0; transform: translateY(10px); animation: rise 0.55s cubic-bezier(0.2,0.7,0.2,1) forwards; }
-      .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}
-      .d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.40s}
-      .d7{animation-delay:.47s}.d8{animation-delay:.54s}
-      @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+    /* ---- featured (Give) ---- */
+    .card--featured{
+      background:linear-gradient(180deg, color-mix(in oklab,var(--accent) 92%,#fff 0%), color-mix(in oklab,var(--accent) 78%,#000 22%));
+      border-color:transparent;
+      box-shadow:0 2px 6px color-mix(in oklab,var(--accent) 30%,transparent), 0 14px 30px color-mix(in oklab,var(--accent) 24%,transparent);
     }
+    .card--featured .card__title{color:#fff;}
+    .card--featured .card__desc{color:rgba(255,255,255,.74);}
+    .card--featured .card__logo .glyph{color:#fff;}
+    .card--featured .card__ext{color:rgba(255,255,255,.85);opacity:1;}
+    .card--featured .iconbtn{color:rgba(255,255,255,.78);}
+    .card--featured .iconbtn:hover{background:rgba(255,255,255,.16);color:#fff;}
+    .card--featured:hover{transform:translateY(-2px);box-shadow:0 4px 10px color-mix(in oklab,var(--accent) 34%,transparent),0 20px 40px color-mix(in oklab,var(--accent) 30%,transparent);}
 
-    a:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    /* ---- footer ---- */
+    .foot{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      margin-top:40px;color:var(--muted);font-size:13px;
+    }
+    .foot .dot{opacity:.6;}
+
+    /* ---- toast ---- */
+    .toast{
+      position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);
+      display:flex;align-items:center;gap:8px;
+      background:var(--ink);color:var(--bg);
+      padding:11px 16px;border-radius:12px;
+      font-size:13.5px;font-weight:500;
+      box-shadow:0 10px 30px rgba(0,0,0,.22);
+      opacity:0;pointer-events:none;z-index:50;
+      transition:opacity .22s ease, transform .22s ease;
+    }
+    .toast svg{width:15px;height:15px;color:#7FD8B0;}
+    .toast__icon{display:flex;}
+    .toast--show{opacity:1;transform:translate(-50%,0);}
+
+    /* ---- QR modal ---- */
+    .modal{
+      position:fixed;inset:0;z-index:60;
+      background:rgba(28,24,16,.42);backdrop-filter:blur(3px);
+      display:flex;align-items:center;justify-content:center;padding:24px;
+      animation:fade .18s ease;
+    }
+    @keyframes fade{from{opacity:0;}to{opacity:1;}}
+    .modal__card{
+      position:relative;width:100%;max-width:320px;
+      background:var(--card);border:1px solid var(--card-bd);
+      border-radius:22px;padding:26px 24px 22px;text-align:center;
+      box-shadow:0 24px 60px rgba(0,0,0,.3);
+      animation:pop .2s cubic-bezier(.2,.9,.3,1.2);
+    }
+    @keyframes pop{from{opacity:0;transform:scale(.94) translateY(8px);}to{opacity:1;transform:none;}}
+    .modal__close{position:absolute;top:12px;right:12px;}
+    .modal__label{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--label);}
+    .modal__title{font-family:var(--serif);font-weight:600;font-size:20px;margin-top:4px;color:var(--ink);}
+    .qr{
+      width:188px;height:188px;margin:18px auto 14px;
+      background:#fff;border-radius:14px;padding:12px;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);
+    }
+    .qr img{width:100%;height:100%;image-rendering:pixelated;display:block;}
+    .qr__fallback{color:var(--muted);font-size:13px;}
+    .modal__url{font-size:12.5px;color:var(--muted);word-break:break-all;margin-bottom:18px;}
+    .modal__btns{display:flex;gap:9px;}
+    .btn{
+      flex:1;padding:11px 14px;border-radius:11px;border:none;cursor:pointer;
+      background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;font-family:var(--sans);
+      text-decoration:none;display:flex;align-items:center;justify-content:center;
+      transition:filter .14s ease,transform .1s ease;
+    }
+    .btn:hover{filter:brightness(1.08);}
+    .btn:active{transform:scale(.97);}
+    .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+    .btn--ghost{background:transparent;color:var(--ink-soft);box-shadow:inset 0 0 0 1.5px var(--card-bd);}
+    .btn--ghost:hover{filter:none;background:color-mix(in oklab,var(--ink) 6%,transparent);}
+
+    @media (prefers-reduced-motion:reduce){
+      *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <header class="header">
-      <div class="logo reveal d1" aria-hidden="true">LCR</div>
-      <h1 class="church-name reveal d2">LifeChurch <span class="accent">Riverside</span> Detroit</h1>
-      <p class="tagline reveal d3">Listen, watch, give, and connect with us.</p>
-      <a class="site-link reveal d3" href="https://www.lifechurchriversidedetroit.org" target="_blank" rel="noopener noreferrer">
-        Visit our website
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10M7 17L17 7"/></svg>
-      </a>
-    </header>
+  <div class="page">
+    <main class="wrap">
+      <header class="head">
+        <div class="mark"><span>LCR</span></div>
+        <h1 class="brandname">LifeChurch <em>Riverside</em> Detroit</h1>
+        <p class="tagline">Listen, watch, give, and connect with us.</p>
+        <a class="visit" href="https://www.lifechurchriversidedetroit.org" target="_blank" rel="noopener noreferrer">
+          Visit our website
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </a>
+      </header>
 
-    <p class="section-label reveal d3">Listen to the Sunday Sermon</p>
-    <div class="links">
-      <a class="link reveal d4" href="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" target="_blank" rel="noopener noreferrer" aria-label="Listen on Spotify">
-        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12s12-5.4 12-12S18.66 0 12 0m5.521 17.34c-.24.359-.66.48-1.021.24c-2.82-1.74-6.36-2.101-10.561-1.141c-.418.122-.779-.179-.899-.539c-.12-.421.18-.78.54-.9c4.56-1.021 8.52-.6 11.64 1.32c.42.18.479.659.301 1.02m1.44-3.3c-.301.42-.841.6-1.262.3c-3.239-1.98-8.159-2.58-11.939-1.38c-.479.12-1.02-.12-1.14-.6s.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2m.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721c-.18-.601.18-1.2.72-1.381c4.26-1.26 11.28-1.02 15.721 1.621c.539.3.719 1.02.419 1.56c-.299.421-1.02.599-1.559.3"/></svg></span>
-        <span class="text"><span class="title">Sunday Sermon Podcast</span><span class="sub">Listen on Spotify</span></span>
-        <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10M7 17L17 7"/></svg>
-      </a>
-      <a class="link reveal d5" href="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" target="_blank" rel="noopener noreferrer" aria-label="Listen on Apple Podcasts">
-        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.34 0A5.33 5.33 0 0 0 0 5.34v13.32A5.33 5.33 0 0 0 5.34 24h13.32A5.33 5.33 0 0 0 24 18.66V5.34A5.33 5.33 0 0 0 18.66 0zm6.525 2.568c2.336 0 4.448.902 6.056 2.587c1.224 1.272 1.912 2.619 2.264 4.392c.12.59.12 2.2.007 2.864a8.5 8.5 0 0 1-3.24 5.296c-.608.46-2.096 1.261-2.336 1.261c-.088 0-.096-.091-.056-.46c.072-.592.144-.715.48-.856c.536-.224 1.448-.874 2.008-1.435a7.64 7.64 0 0 0 2.008-3.536c.208-.824.184-2.656-.048-3.504c-.728-2.696-2.928-4.792-5.624-5.352c-.784-.16-2.208-.16-3 0c-2.728.56-4.984 2.76-5.672 5.528c-.184.752-.184 2.584 0 3.336c.456 1.832 1.64 3.512 3.192 4.512c.304.2.672.408.824.472c.336.144.408.264.472.856c.04.36.03.464-.056.464c-.056 0-.464-.176-.896-.384l-.04-.03c-2.472-1.216-4.056-3.274-4.632-6.012c-.144-.706-.168-2.392-.03-3.04c.36-1.74 1.048-3.1 2.192-4.304c1.648-1.737 3.768-2.656 6.128-2.656zm.134 2.81c.409.004.803.04 1.106.106c2.784.62 4.76 3.408 4.376 6.174c-.152 1.114-.536 2.03-1.216 2.88c-.336.43-1.152 1.15-1.296 1.15c-.023 0-.048-.272-.048-.603v-.605l.416-.496c1.568-1.878 1.456-4.502-.256-6.224c-.664-.67-1.432-1.064-2.424-1.246c-.64-.118-.776-.118-1.448-.008c-1.02.167-1.81.562-2.512 1.256c-1.72 1.704-1.832 4.342-.264 6.222l.413.496v.608c0 .336-.027.608-.06.608c-.03 0-.264-.16-.512-.36l-.034-.011c-.832-.664-1.568-1.842-1.872-2.997c-.184-.698-.184-2.024.008-2.72c.504-1.878 1.888-3.335 3.808-4.019c.41-.145 1.133-.22 1.814-.211zm-.13 2.99c.31 0 .62.06.844.178a2.17 2.17 0 0 1 1.04 1.259c.464 1.578-1.208 2.96-2.72 2.254h-.015c-.712-.331-1.096-.956-1.104-1.77c0-.733.408-1.371 1.112-1.745c.224-.117.534-.176.844-.176zm-.011 4.728c.988-.004 1.706.349 1.97.97c.198.464.124 1.932-.218 4.302c-.232 1.656-.36 2.074-.68 2.356c-.44.39-1.064.498-1.656.288h-.003c-.716-.257-.87-.605-1.164-2.644c-.341-2.37-.416-3.838-.218-4.302c.262-.616.974-.966 1.97-.97z"/></svg></span>
-        <span class="text"><span class="title">Sunday Sermon Podcast</span><span class="sub">Listen on Apple Podcasts</span></span>
-        <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10M7 17L17 7"/></svg>
-      </a>
-    </div>
+      <section class="section">
+        <h2 class="seclabel">Listen to the Sunday sermon</h2>
+        <div class="cards">
+          <div class="card">
+            <a class="card__hit" href="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" target="_blank" rel="noopener noreferrer" aria-label="Sunday Sermon Podcast — Listen on Spotify"></a>
+            <div class="card__row">
+              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1DB954"/><g fill="none" stroke="#fff" stroke-linecap="round"><path stroke-width="2.3" d="M5.6 9.2c4.4-1.4 9-1 12.9 1.5"/><path stroke-width="1.95" d="M6.5 12.7c3.6-1.1 7.4-.8 10.6 1.2"/><path stroke-width="1.6" d="M7.3 15.9c2.8-.8 5.6-.6 8.1 1"/></g></svg></span>
+              <span class="card__meta">
+                <span class="card__title">Sunday Sermon Podcast</span>
+                <span class="card__desc">Listen on Spotify</span>
+              </span>
+              <span class="card__right">
+                <span class="card__actions">
+                  <button class="iconbtn" data-action="copy" data-url="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" title="Copy link" aria-label="Copy link to Sunday Sermon Podcast on Spotify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
+                  <button class="iconbtn" data-action="share" data-url="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" data-title="Sunday Sermon Podcast" data-desc="Listen on Spotify" title="Share" aria-label="Share Sunday Sermon Podcast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
+                  <button class="iconbtn" data-action="qr" data-url="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" data-title="Sunday Sermon Podcast" data-id="spotify" title="Show QR code" aria-label="Show QR code for Sunday Sermon Podcast on Spotify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
+                </span>
+                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              </span>
+            </div>
+          </div>
 
-    <p class="section-label reveal d5">Watch &amp; Follow</p>
-    <div class="links">
-      <a class="link reveal d6" href="https://www.youtube.com/@LCR313" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube">
-        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.02 3.02 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.02 3.02 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.02 3.02 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.02 3.02 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814M9.545 15.568V8.432L15.818 12z"/></svg></span>
-        <span class="text"><span class="title">YouTube</span><span class="sub">Watch services &amp; messages</span></span>
-        <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10M7 17L17 7"/></svg>
-      </a>
-      <a class="link reveal d7" href="https://www.facebook.com/lcr313" target="_blank" rel="noopener noreferrer" aria-label="Follow on Facebook">
-        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978c.401 0 .955.042 1.468.103a9 9 0 0 1 1.141.195v3.325a9 9 0 0 0-.653-.036a27 27 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.7 1.7 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103l-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647"/></svg></span>
-        <span class="text"><span class="title">Facebook</span><span class="sub">Follow for updates</span></span>
-        <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10M7 17L17 7"/></svg>
-      </a>
-    </div>
+          <div class="card">
+            <a class="card__hit" href="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" target="_blank" rel="noopener noreferrer" aria-label="Sunday Sermon Podcast — Listen on Apple Podcasts"></a>
+            <div class="card__row">
+              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><defs><linearGradient id="apg" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#D873E8"/><stop offset="1" stop-color="#7E29BE"/></linearGradient></defs><circle cx="12" cy="12" r="12" fill="url(#apg)"/><g fill="#fff"><circle cx="12" cy="8.4" r="2.5"/><path d="M9.55 13.05c-.62.5-1.02 1.24-1.02 2.06 0 1.62 1.55 2.74 3.47 2.74s3.47-1.12 3.47-2.74c0-.82-.4-1.56-1.02-2.06-.46-.37-1.05-.04-1.05.55v.02c0 .77-.62 1.39-1.4 1.39s-1.4-.62-1.4-1.39v-.02c0-.59-.59-.92-1.05-.55Z"/><path d="M12 18.7c-.7 0-1.27.16-1.27.92 0 .5.4 1.86.7 2.66.18.48.32.72.57.72s.39-.24.57-.72c.3-.8.7-2.16.7-2.66 0-.76-.57-.92-1.27-.92Z"/></g></svg></span>
+              <span class="card__meta">
+                <span class="card__title">Sunday Sermon Podcast</span>
+                <span class="card__desc">Listen on Apple Podcasts</span>
+              </span>
+              <span class="card__right">
+                <span class="card__actions">
+                  <button class="iconbtn" data-action="copy" data-url="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" title="Copy link" aria-label="Copy link to Sunday Sermon Podcast on Apple Podcasts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
+                  <button class="iconbtn" data-action="share" data-url="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" data-title="Sunday Sermon Podcast" data-desc="Listen on Apple Podcasts" title="Share" aria-label="Share Sunday Sermon Podcast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
+                  <button class="iconbtn" data-action="qr" data-url="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" data-title="Sunday Sermon Podcast" data-id="apple" title="Show QR code" aria-label="Show QR code for Sunday Sermon Podcast on Apple Podcasts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
+                </span>
+                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <p class="section-label reveal d7">Support the Ministry</p>
-    <div class="links">
-      <a class="link give reveal d8" href="https://lifechurch-riverside.churchcenter.com/giving" target="_blank" rel="noopener noreferrer" aria-label="Give online">
-        <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M11 14h2a2 2 0 0 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/><path d="m14.45 13.39l5.05-4.694C20.196 8 21 6.85 21 5.75a2.75 2.75 0 0 0-4.797-1.837a.276.276 0 0 1-.406 0A2.75 2.75 0 0 0 11 5.75c0 1.2.802 2.248 1.5 2.946L16 11.95M2 15l6 6"/><path d="m7 20l1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a1 1 0 0 0-2.75-2.91"/></g></svg></span>
-        <span class="text"><span class="title">Give Online</span><span class="sub">Secure giving via Church Center</span></span>
-        <svg class="arrow" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10M7 17L17 7"/></svg>
-      </a>
-    </div>
+      <section class="section">
+        <h2 class="seclabel">Watch &amp; follow</h2>
+        <div class="cards">
+          <div class="card">
+            <a class="card__hit" href="https://www.youtube.com/@LCR313" target="_blank" rel="noopener noreferrer" aria-label="YouTube — Watch services & messages"></a>
+            <div class="card__row">
+              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><rect x="0.5" y="4.2" width="23" height="15.6" rx="5" fill="#FF0000"/><path d="M10 8.6 16.2 12 10 15.4Z" fill="#fff"/></svg></span>
+              <span class="card__meta">
+                <span class="card__title">YouTube</span>
+                <span class="card__desc">Watch services &amp; messages</span>
+              </span>
+              <span class="card__right">
+                <span class="card__actions">
+                  <button class="iconbtn" data-action="copy" data-url="https://www.youtube.com/@LCR313" title="Copy link" aria-label="Copy link to YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
+                  <button class="iconbtn" data-action="share" data-url="https://www.youtube.com/@LCR313" data-title="YouTube" data-desc="Watch services & messages" title="Share" aria-label="Share YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
+                  <button class="iconbtn" data-action="qr" data-url="https://www.youtube.com/@LCR313" data-title="YouTube" data-id="youtube" title="Show QR code" aria-label="Show QR code for YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
+                </span>
+                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              </span>
+            </div>
+          </div>
 
-    <footer class="footer reveal d8">
-      LifeChurch Riverside <span class="dot">&bull;</span> Detroit, Michigan
-    </footer>
-  </main>
+          <div class="card">
+            <a class="card__hit" href="https://www.facebook.com/lcr313" target="_blank" rel="noopener noreferrer" aria-label="Facebook — Follow for updates"></a>
+            <div class="card__row">
+              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path fill="#fff" d="M14.9 7.7h-1.6c-.66 0-1.1.44-1.1 1.12v1.6h2.6l-.36 2.5h-2.24V20.6h-2.5v-7.08H7.6v-2.5h1.7V8.66c0-1.96 1.2-3.16 3.06-3.16h2.54Z"/></svg></span>
+              <span class="card__meta">
+                <span class="card__title">Facebook</span>
+                <span class="card__desc">Follow for updates</span>
+              </span>
+              <span class="card__right">
+                <span class="card__actions">
+                  <button class="iconbtn" data-action="copy" data-url="https://www.facebook.com/lcr313" title="Copy link" aria-label="Copy link to Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
+                  <button class="iconbtn" data-action="share" data-url="https://www.facebook.com/lcr313" data-title="Facebook" data-desc="Follow for updates" title="Share" aria-label="Share Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
+                  <button class="iconbtn" data-action="qr" data-url="https://www.facebook.com/lcr313" data-title="Facebook" data-id="facebook" title="Show QR code" aria-label="Show QR code for Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
+                </span>
+                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="seclabel">Support the ministry</h2>
+        <div class="cards">
+          <div class="card card--featured">
+            <a class="card__hit" href="https://lifechurch-riverside.churchcenter.com/giving" target="_blank" rel="noopener noreferrer" aria-label="Give Online — Secure giving via Church Center"></a>
+            <div class="card__row">
+              <span class="card__logo"><svg viewBox="0 0 24 24" class="glyph" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 14h2a2 2 0 1 0 0-4h-3.6a3 3 0 0 0-2.1.9L2 16"/><path d="m5 19 1.9-1.9a3 3 0 0 1 2.1-.9H13c1 0 1.9-.3 2.6-1l4-3.8a1.7 1.7 0 0 0-2.4-2.4l-3.6 3.3"/><path d="M18.3 7.7a1.9 1.9 0 0 0-2.7-2.7l-.6.6-.6-.6A1.9 1.9 0 1 0 11.7 7.7l2.7 2.7Z"/></svg></span>
+              <span class="card__meta">
+                <span class="card__title">Give Online</span>
+                <span class="card__desc">Secure giving via Church Center</span>
+              </span>
+              <span class="card__right">
+                <span class="card__actions">
+                  <button class="iconbtn" data-action="copy" data-url="https://lifechurch-riverside.churchcenter.com/giving" title="Copy link" aria-label="Copy link to Give Online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
+                  <button class="iconbtn" data-action="share" data-url="https://lifechurch-riverside.churchcenter.com/giving" data-title="Give Online" data-desc="Secure giving via Church Center" title="Share" aria-label="Share Give Online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
+                  <button class="iconbtn" data-action="qr" data-url="https://lifechurch-riverside.churchcenter.com/giving" data-title="Give Online" data-id="give" title="Show QR code" aria-label="Show QR code for Give Online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
+                </span>
+                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>LifeChurch Riverside</span>
+        <span class="dot">&bull;</span>
+        <span>Detroit, Michigan</span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+    <span class="toast__msg"></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js" integrity="sha384-8FWZA6BGMXhsfO+BLtrJK0We6gg5o1JyO8xQm6peWDEUs17ACA5ziE/NIAkl9z2k" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
 </body>
 </html>

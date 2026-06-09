@@ -61,9 +61,13 @@
       allow: "autoplay *; encrypted-media *; clipboard-write",
     },
     youtube: {
-      src: "https://www.youtube-nocookie.com/embed/videoseries?list=UUVUvukSxWfIR2IjqYTIjRrQ",
+      // Pinned to a specific video — the most recent Sunday livestream. The
+      // channel's auto uploads-playlist lagged behind the newest stream, so we
+      // set this by hand. To update after a new service, replace the 11-char
+      // id below (e.g. from youtube.com/watch?v=THIS_PART).
+      src: "https://www.youtube-nocookie.com/embed/N23rpka8Iqw",
       video: true,
-      title: "YouTube player — LCR Detroit latest uploads",
+      title: "YouTube player — latest worship service",
       allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
     },
   };

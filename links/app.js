@@ -46,8 +46,64 @@
     });
   }
 
+  /* ---------- "latest" embed drawers (lazy) ---------- */
+  var EMBEDS = {
+    spotify: {
+      src: "https://open.spotify.com/embed/show/3BezLbBgs6LaCEWwaLZg4n",
+      height: 152,
+      title: "Spotify player — Sunday Sermon Podcast",
+      allow: "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture",
+    },
+    apple: {
+      src: "https://embed.podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385",
+      height: 175,
+      title: "Apple Podcasts player — Sunday Sermon Podcast",
+      allow: "autoplay *; encrypted-media *; clipboard-write",
+    },
+    youtube: {
+      src: "https://www.youtube-nocookie.com/embed/videoseries?list=UUVUvukSxWfIR2IjqYTIjRrQ",
+      video: true,
+      title: "YouTube player — LCR Detroit latest uploads",
+      allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+    },
+  };
+
+  function buildEmbed(holder, key) {
+    var cfg = EMBEDS[key];
+    if (!cfg || !holder || holder.querySelector("iframe")) return;
+    var f = document.createElement("iframe");
+    f.src = cfg.src;
+    f.title = cfg.title;
+    f.loading = "lazy";
+    f.referrerPolicy = "strict-origin-when-cross-origin";
+    f.setAttribute("allow", cfg.allow);
+    f.setAttribute("allowfullscreen", "");
+    if (!cfg.video) f.style.height = cfg.height + "px";
+    holder.appendChild(f);
+  }
+
+  function toggleDrawer(more) {
+    var key = more.getAttribute("data-drawer");
+    var drawer = document.getElementById("drawer-" + key);
+    if (!drawer) return;
+    var isOpen = more.getAttribute("aria-expanded") === "true";
+    if (isOpen) {
+      drawer.hidden = true;
+      more.setAttribute("aria-expanded", "false");
+    } else {
+      buildEmbed(drawer.querySelector(".embed"), key); // lazy — iframe only on first open
+      drawer.hidden = false;
+      more.setAttribute("aria-expanded", "true");
+    }
+  }
+
   /* ---------- card action buttons (event delegation) ---------- */
   document.addEventListener("click", function (e) {
+    var more = e.target.closest(".card__more[data-drawer]");
+    if (more) {
+      toggleDrawer(more);
+      return;
+    }
     var btn = e.target.closest(".iconbtn[data-action]");
     if (!btn) return;
     // Buttons sit above the stretched card link — don't navigate.

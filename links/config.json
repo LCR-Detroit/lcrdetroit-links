@@ -1,0 +1,92 @@
+{
+  "header": {
+    "monogram": "LCR",
+    "brand": "LifeChurch Riverside Detroit",
+    "brandAccent": "Riverside",
+    "tagline": "Listen, watch, give, and connect with us.",
+    "website": {
+      "label": "Visit our website",
+      "url": "https://www.lifechurchriversidedetroit.org"
+    }
+  },
+  "sections": [
+    {
+      "label": "Listen to the Sunday sermon",
+      "cards": [
+        {
+          "id": "spotify",
+          "logo": "spotify",
+          "title": "Sunday Sermon Podcast",
+          "desc": "Listen on Spotify",
+          "url": "https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n",
+          "drawer": {
+            "kind": "iframe",
+            "label": "Latest episode",
+            "embedUrl": "https://open.spotify.com/embed/show/3BezLbBgs6LaCEWwaLZg4n",
+            "height": 152,
+            "openUrl": "https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n",
+            "openLabel": "Open in Spotify"
+          }
+        },
+        {
+          "id": "apple",
+          "logo": "apple",
+          "title": "Sunday Sermon Podcast",
+          "desc": "Listen on Apple Podcasts",
+          "url": "https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385",
+          "drawer": {
+            "kind": "iframe",
+            "label": "Latest episode",
+            "embedUrl": "https://embed.podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385",
+            "height": 175,
+            "openUrl": "https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385",
+            "openLabel": "Open in Apple Podcasts"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Watch & follow",
+      "cards": [
+        {
+          "id": "youtube",
+          "logo": "youtube",
+          "title": "YouTube",
+          "desc": "Watch services & messages",
+          "url": "https://www.youtube.com/@LCR313",
+          "drawer": {
+            "kind": "video",
+            "label": "Latest service",
+            "embedUrl": "https://www.youtube-nocookie.com/embed/N23rpka8Iqw",
+            "openUrl": "https://www.youtube.com/@LCR313",
+            "openLabel": "Open in YouTube"
+          }
+        },
+        {
+          "id": "facebook",
+          "logo": "facebook",
+          "title": "Facebook",
+          "desc": "Follow for updates",
+          "url": "https://www.facebook.com/lcr313"
+        }
+      ]
+    },
+    {
+      "label": "Support the ministry",
+      "cards": [
+        {
+          "id": "give",
+          "logo": "give",
+          "featured": true,
+          "title": "Give Online",
+          "desc": "Secure giving via Church Center",
+          "url": "https://lifechurch-riverside.churchcenter.com/giving"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "left": "LifeChurch Riverside",
+    "right": "Detroit, Michigan"
+  }
+}

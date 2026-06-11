@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Content Security Policy: allow only what this page uses.
-       - script: our own app.js (self) + the pinned QR library on jsDelivr (SRI'd below)
-       - style:  inline <style> block + Google Fonts stylesheet
-       - font:   Google Fonts files
-       - img:    self + data: URIs (the generated QR code is a data: GIF)
-       - frame:  the lazy media embeds (Spotify / Apple Podcasts / YouTube-nocookie)
-       Everything else (objects, outbound connections) is denied.
+       - script:  our own app.js (self) + the pinned QR library on jsDelivr (SRI'd below)
+       - style:   inline <style> block + Google Fonts stylesheet
+       - font:    Google Fonts files
+       - img:     self + data: URIs (the generated QR code is a data: GIF)
+       - connect: self — app.js fetches config.json (the page's content) same-origin
+       - frame:   the lazy media embeds (Spotify / Apple Podcasts / YouTube-nocookie)
+       Everything else (objects, other outbound connections) is denied.
        frame-ancestors intentionally omitted so /links can be iframe-embedded later. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; frame-src https://open.spotify.com https://embed.podcasts.apple.com https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src https://open.spotify.com https://embed.podcasts.apple.com https://www.youtube-nocookie.com; base-uri 'none'; form-action 'none'" />
 
   <title>LifeChurch Riverside Detroit — Links</title>
   <meta name="description" content="Listen, watch, give, and connect with LifeChurch Riverside Detroit." />
@@ -279,166 +280,14 @@
 </head>
 <body>
   <div class="page">
-    <main class="wrap">
-      <header class="head">
-        <div class="mark"><span>LCR</span></div>
-        <h1 class="brandname">LifeChurch <em>Riverside</em> Detroit</h1>
-        <p class="tagline">Listen, watch, give, and connect with us.</p>
-        <a class="visit" href="https://www.lifechurchriversidedetroit.org" target="_blank" rel="noopener noreferrer">
-          Visit our website
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </a>
-      </header>
-
-      <section class="section">
-        <h2 class="seclabel">Listen to the Sunday sermon</h2>
-        <div class="cards">
-          <div class="card">
-            <div class="card__row">
-              <a class="card__hit" href="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" target="_blank" rel="noopener noreferrer" aria-label="Sunday Sermon Podcast — Listen on Spotify"></a>
-              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1DB954"/><g fill="none" stroke="#fff" stroke-linecap="round"><path stroke-width="2.3" d="M5.6 9.2c4.4-1.4 9-1 12.9 1.5"/><path stroke-width="1.95" d="M6.5 12.7c3.6-1.1 7.4-.8 10.6 1.2"/><path stroke-width="1.6" d="M7.3 15.9c2.8-.8 5.6-.6 8.1 1"/></g></svg></span>
-              <span class="card__meta">
-                <span class="card__title">Sunday Sermon Podcast</span>
-                <span class="card__desc">Listen on Spotify</span>
-              </span>
-              <span class="card__right">
-                <span class="card__actions">
-                  <button class="iconbtn" type="button" data-action="copy" data-url="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" title="Copy link" aria-label="Copy link to Sunday Sermon Podcast on Spotify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="share" data-url="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" data-title="Sunday Sermon Podcast" data-desc="Listen on Spotify" title="Share" aria-label="Share Sunday Sermon Podcast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="qr" data-url="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" data-title="Sunday Sermon Podcast" data-id="spotify" title="Show QR code" aria-label="Show QR code for Sunday Sermon Podcast on Spotify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
-                </span>
-                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              </span>
-            </div>
-            <button class="card__more" type="button" data-drawer="spotify" aria-expanded="false" aria-controls="drawer-spotify">
-              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-              <span>Latest episode</span>
-            </button>
-            <div class="card__drawer" id="drawer-spotify" hidden>
-              <div class="embed" data-embed="spotify"></div>
-              <a class="drawer__open" href="https://open.spotify.com/show/3BezLbBgs6LaCEWwaLZg4n" target="_blank" rel="noopener noreferrer">
-                Open in Spotify
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card__row">
-              <a class="card__hit" href="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" target="_blank" rel="noopener noreferrer" aria-label="Sunday Sermon Podcast — Listen on Apple Podcasts"></a>
-              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><defs><linearGradient id="apg" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#D873E8"/><stop offset="1" stop-color="#7E29BE"/></linearGradient></defs><circle cx="12" cy="12" r="12" fill="url(#apg)"/><g fill="#fff"><circle cx="12" cy="8.4" r="2.5"/><path d="M9.55 13.05c-.62.5-1.02 1.24-1.02 2.06 0 1.62 1.55 2.74 3.47 2.74s3.47-1.12 3.47-2.74c0-.82-.4-1.56-1.02-2.06-.46-.37-1.05-.04-1.05.55v.02c0 .77-.62 1.39-1.4 1.39s-1.4-.62-1.4-1.39v-.02c0-.59-.59-.92-1.05-.55Z"/><path d="M12 18.7c-.7 0-1.27.16-1.27.92 0 .5.4 1.86.7 2.66.18.48.32.72.57.72s.39-.24.57-.72c.3-.8.7-2.16.7-2.66 0-.76-.57-.92-1.27-.92Z"/></g></svg></span>
-              <span class="card__meta">
-                <span class="card__title">Sunday Sermon Podcast</span>
-                <span class="card__desc">Listen on Apple Podcasts</span>
-              </span>
-              <span class="card__right">
-                <span class="card__actions">
-                  <button class="iconbtn" type="button" data-action="copy" data-url="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" title="Copy link" aria-label="Copy link to Sunday Sermon Podcast on Apple Podcasts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="share" data-url="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" data-title="Sunday Sermon Podcast" data-desc="Listen on Apple Podcasts" title="Share" aria-label="Share Sunday Sermon Podcast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="qr" data-url="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" data-title="Sunday Sermon Podcast" data-id="apple" title="Show QR code" aria-label="Show QR code for Sunday Sermon Podcast on Apple Podcasts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
-                </span>
-                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              </span>
-            </div>
-            <button class="card__more" type="button" data-drawer="apple" aria-expanded="false" aria-controls="drawer-apple">
-              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-              <span>Latest episode</span>
-            </button>
-            <div class="card__drawer" id="drawer-apple" hidden>
-              <div class="embed" data-embed="apple"></div>
-              <a class="drawer__open" href="https://podcasts.apple.com/us/podcast/sunday-sermon-with-pastor-georgia-hill-lcr-detroit/id1883584385" target="_blank" rel="noopener noreferrer">
-                Open in Apple Podcasts
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2 class="seclabel">Watch &amp; follow</h2>
-        <div class="cards">
-          <div class="card">
-            <div class="card__row">
-              <a class="card__hit" href="https://www.youtube.com/@LCR313" target="_blank" rel="noopener noreferrer" aria-label="YouTube — Watch services & messages"></a>
-              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><rect x="0.5" y="4.2" width="23" height="15.6" rx="5" fill="#FF0000"/><path d="M10 8.6 16.2 12 10 15.4Z" fill="#fff"/></svg></span>
-              <span class="card__meta">
-                <span class="card__title">YouTube</span>
-                <span class="card__desc">Watch services &amp; messages</span>
-              </span>
-              <span class="card__right">
-                <span class="card__actions">
-                  <button class="iconbtn" type="button" data-action="copy" data-url="https://www.youtube.com/@LCR313" title="Copy link" aria-label="Copy link to YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="share" data-url="https://www.youtube.com/@LCR313" data-title="YouTube" data-desc="Watch services & messages" title="Share" aria-label="Share YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="qr" data-url="https://www.youtube.com/@LCR313" data-title="YouTube" data-id="youtube" title="Show QR code" aria-label="Show QR code for YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
-                </span>
-                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              </span>
-            </div>
-            <button class="card__more" type="button" data-drawer="youtube" aria-expanded="false" aria-controls="drawer-youtube">
-              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-              <span>Latest service</span>
-            </button>
-            <div class="card__drawer" id="drawer-youtube" hidden>
-              <div class="embed embed--video" data-embed="youtube"></div>
-              <a class="drawer__open" href="https://www.youtube.com/@LCR313" target="_blank" rel="noopener noreferrer">
-                Open in YouTube
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card__row">
-              <a class="card__hit" href="https://www.facebook.com/lcr313" target="_blank" rel="noopener noreferrer" aria-label="Facebook — Follow for updates"></a>
-              <span class="card__logo"><svg viewBox="0 0 24 24" class="brand" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path fill="#fff" d="M14.9 7.7h-1.6c-.66 0-1.1.44-1.1 1.12v1.6h2.6l-.36 2.5h-2.24V20.6h-2.5v-7.08H7.6v-2.5h1.7V8.66c0-1.96 1.2-3.16 3.06-3.16h2.54Z"/></svg></span>
-              <span class="card__meta">
-                <span class="card__title">Facebook</span>
-                <span class="card__desc">Follow for updates</span>
-              </span>
-              <span class="card__right">
-                <span class="card__actions">
-                  <button class="iconbtn" type="button" data-action="copy" data-url="https://www.facebook.com/lcr313" title="Copy link" aria-label="Copy link to Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="share" data-url="https://www.facebook.com/lcr313" data-title="Facebook" data-desc="Follow for updates" title="Share" aria-label="Share Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="qr" data-url="https://www.facebook.com/lcr313" data-title="Facebook" data-id="facebook" title="Show QR code" aria-label="Show QR code for Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
-                </span>
-                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2 class="seclabel">Support the ministry</h2>
-        <div class="cards">
-          <div class="card card--featured">
-            <div class="card__row">
-              <a class="card__hit" href="https://lifechurch-riverside.churchcenter.com/giving" target="_blank" rel="noopener noreferrer" aria-label="Give Online — Secure giving via Church Center"></a>
-              <span class="card__logo"><svg viewBox="0 0 24 24" class="glyph" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 14h2a2 2 0 1 0 0-4h-3.6a3 3 0 0 0-2.1.9L2 16"/><path d="m5 19 1.9-1.9a3 3 0 0 1 2.1-.9H13c1 0 1.9-.3 2.6-1l4-3.8a1.7 1.7 0 0 0-2.4-2.4l-3.6 3.3"/><path d="M18.3 7.7a1.9 1.9 0 0 0-2.7-2.7l-.6.6-.6-.6A1.9 1.9 0 1 0 11.7 7.7l2.7 2.7Z"/></svg></span>
-              <span class="card__meta">
-                <span class="card__title">Give Online</span>
-                <span class="card__desc">Secure giving via Church Center</span>
-              </span>
-              <span class="card__right">
-                <span class="card__actions">
-                  <button class="iconbtn" type="button" data-action="copy" data-url="https://lifechurch-riverside.churchcenter.com/giving" title="Copy link" aria-label="Copy link to Give Online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.4"/><path d="M5 15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="share" data-url="https://lifechurch-riverside.churchcenter.com/giving" data-title="Give Online" data-desc="Secure giving via Church Center" title="Share" aria-label="Share Give Online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.7 7.4-4.3M8.3 13.3l7.4 4.3"/></svg></button>
-                  <button class="iconbtn" type="button" data-action="qr" data-url="https://lifechurch-riverside.churchcenter.com/giving" data-title="Give Online" data-id="give" title="Show QR code" aria-label="Show QR code for Give Online"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3M21 14v.01M21 21v-4M17 21h4M14 21v-3.5" stroke-linecap="round"/></svg></button>
-                </span>
-                <span class="card__ext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer class="foot">
-        <span>LifeChurch Riverside</span>
-        <span class="dot">&bull;</span>
-        <span>Detroit, Michigan</span>
-      </footer>
-    </main>
+    <!-- Content is rendered from config.json by app.js. -->
+    <main class="wrap" id="app"></main>
+    <noscript>
+      <div class="wrap" style="text-align:center;color:var(--muted)">
+        <p>This page needs JavaScript to load. Visit
+          <a href="https://www.lifechurchriversidedetroit.org">lifechurchriversidedetroit.org</a>.</p>
+      </div>
+    </noscript>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite">
